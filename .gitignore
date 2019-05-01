@@ -1,5 +1,5 @@
-.logs/
+logs/
 .idea/
-.models/
+models/
 *.swp
 *.pyc
