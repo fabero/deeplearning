@@ -4,3 +4,4 @@ models/
 *.swp
 *.pyc
 job_files/
+*.out
