@@ -34,10 +34,11 @@ class DataGenerator(Sequence):
 
 
 			for filename in filenames:
-				self.num_of_files=self.num_of_files+1
-				category = dirname.split('/')[-1]
-				id=LABEL_IDS[category]
-				self.all_files.append((dirname,category,filename,id))
+				if not filename.startswith('.'):
+					self.num_of_files=self.num_of_files+1
+					category = dirname.split('/')[-1]
+					id=LABEL_IDS[category]
+					self.all_files.append((dirname,category,filename,id))
 
 
 	def on_epoch_end(self):

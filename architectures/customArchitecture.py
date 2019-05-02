@@ -1,9 +1,10 @@
 from keras.models import Model,Sequential
-from keras.layers import Input, Conv2D, BatchNormalization, LeakyReLU, MaxPooling2D, Lambda, concatenate, Reshape,Flatten,Softmax,Dense,Dropout
+from keras.layers import Input, Conv2D, BatchNormalization, LeakyReLU, MaxPooling2D, Lambda, concatenate,Flatten,Softmax,Dense,Dropout
 import numpy as np
 import tensorflow as tf
 import keras.backend as K
 from keras.optimizers import SGD, Adam, RMSprop
+from keras.layers import ReLU,PReLU,ELU
 
 from keras.callbacks import TensorBoard,EarlyStopping,ModelCheckpoint
 from utils.data_generator import DataGenerator
@@ -22,10 +23,54 @@ class CustomNetwork():
 		self.training_settings_name = training_settings_name
 		#Initialise constants over here.
 
+		self.check_and_set_required_dirs() #It will make and set logs dir and models dir
+
 		if not config_pickle:
 			pass
 		else:
 			pass
+
+
+	def get_activation(self):
+		activation_type = self.activation_type
+		if activation_type ==1:
+			activation = LeakyReLU(alpha=0.1)
+		elif activation_type == 2:
+			activation = ReLU()
+		elif activation_type == 3:
+			activation = PReLU(alpha_initializer='zeros', alpha_regularizer=None, alpha_constraint=None, shared_axes=None)
+		elif activation_type == 4:
+			activation=ELU(alpha=1.0)
+		else:
+			raise Exception('Not a valid activation type')
+
+		return activation
+
+	def set_activation_type(self,activation_type=1):
+		'''
+		:param activation_type: 1-> LeakyRelu, 2-> Relu, 3-> PreRelu,4-> ELU
+		:return:
+		'''
+		self.activation_type = activation_type
+
+
+	def check_and_set_required_dirs(self):
+		self.logs_dir = './logs/'+self.training_settings_name+'/'
+		self.models_dir= './models/'+ self.training_settings_name+'/'
+
+		if not os.path.exists(os.path.dirname(self.models_dir)):
+			try:
+				os.makedirs(os.path.dirname(self.models_dir))
+			except Exception as ex:
+				print(ex)
+				pass
+
+		if not os.path.exists(os.path.dirname(self.logs_dir)):
+			try:
+				os.makedirs(os.path.dirname(self.logs_dir))
+			except Exception as ex:
+				print(ex)
+				pass
 
 	def set_constants_from_config(self,config):
 		'''
@@ -62,45 +107,45 @@ class CustomNetwork():
 		'''
 		x = Conv2D(32, (3, 3), strides=(1, 1), padding='same', name='conv_1', use_bias=False)(input)
 		x = BatchNormalization(name='norm_1')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 		x = MaxPooling2D(pool_size=(2, 2))(x) #Size WxH
 
 		# Layer 2
 		x = Conv2D(64, (3, 3), strides=(1, 1), padding='same', name='conv_2', use_bias=False)(x)
 		x = BatchNormalization(name='norm_2')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 		x = MaxPooling2D(pool_size=(2, 2))(x) #Size WxH
 
 		# Layer 3
 		x = Conv2D(128, (3, 3), strides=(1, 1), padding='same', name='conv_3', use_bias=False)(x)
 		x = BatchNormalization(name='norm_3')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 4
 		x = Conv2D(64, (1, 1), strides=(1, 1), padding='same', name='conv_4', use_bias=False)(x)
 		x = BatchNormalization(name='norm_4')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 5
 		x = Conv2D(128, (3, 3), strides=(1, 1), padding='same', name='conv_5', use_bias=False)(x)
 		x = BatchNormalization(name='norm_5')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 		x = MaxPooling2D(pool_size=(2, 2))(x) #Size WxH
 
 		# Layer 6
 		x = Conv2D(256, (3, 3), strides=(1, 1), padding='same', name='conv_6', use_bias=False)(x)
 		x = BatchNormalization(name='norm_6')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 7
 		x = Conv2D(128, (1, 1), strides=(1, 1), padding='same', name='conv_7', use_bias=False)(x)
 		x = BatchNormalization(name='norm_7')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 8
 		x = Conv2D(256, (3, 3), strides=(1, 1), padding='same', name='conv_8', use_bias=False)(x)
 		x = BatchNormalization(name='norm_8')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 		x = MaxPooling2D(pool_size=(2, 2))(x) #Size W/2 X H/2 = 32x32
 
 		#print(x.shape)
@@ -108,22 +153,22 @@ class CustomNetwork():
 		# Layer 9
 		x = Conv2D(512, (3, 3), strides=(1, 1), padding='same', name='conv_9', use_bias=False)(x)
 		x = BatchNormalization(name='norm_9')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 10
 		x = Conv2D(256, (1, 1), strides=(1, 1), padding='same', name='conv_10', use_bias=False)(x)
 		x = BatchNormalization(name='norm_10')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 11
 		x = Conv2D(512, (3, 3), strides=(1, 1), padding='same', name='conv_11', use_bias=False)(x)
 		x = BatchNormalization(name='norm_11')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 12
 		x = Conv2D(256, (1, 1), strides=(1, 1), padding='same', name='conv_12', use_bias=False)(x)
 		x = BatchNormalization(name='norm_12')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 13
 		x = Conv2D(512, (3, 3), strides=(1, 1), padding='valid', name='conv_13', use_bias=False)(x)
@@ -132,7 +177,7 @@ class CustomNetwork():
 		#x = Conv2D(512, (7, 7), strides=(1, 1), padding='valid', name='conv_13', use_bias=False)(x)
 
 		x = BatchNormalization(name='norm_13')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		skip_connection = x #String output till here in skip connection
 
@@ -141,43 +186,43 @@ class CustomNetwork():
 		# Layer 14
 		x = Conv2D(1024, (3, 3), strides=(1, 1), padding='same', name='conv_14', use_bias=False)(x)
 		x = BatchNormalization(name='norm_14')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 15
 		x = Conv2D(512, (1, 1), strides=(1, 1), padding='same', name='conv_15', use_bias=False)(x)
 		x = BatchNormalization(name='norm_15')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 16
 		x = Conv2D(1024, (3, 3), strides=(1, 1), padding='same', name='conv_16', use_bias=False)(x)
 		x = BatchNormalization(name='norm_16')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 17
 		x = Conv2D(512, (1, 1), strides=(1, 1), padding='same', name='conv_17', use_bias=False)(x)
 		x = BatchNormalization(name='norm_17')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 18
 		x = Conv2D(1024, (3, 3), strides=(1, 1), padding='same', name='conv_18', use_bias=False)(x)
 		x = BatchNormalization(name='norm_18')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 19
 		x = Conv2D(1024, (3, 3), strides=(1, 1), padding='same', name='conv_19', use_bias=False)(x)
 		x = BatchNormalization(name='norm_19')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 20
 		x = Conv2D(1024, (3, 3), strides=(1, 1), padding='same', name='conv_20', use_bias=False)(x)
 		x = BatchNormalization(name='norm_20')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		# Layer 21
 		skip_connection = Conv2D(64, (1, 1), strides=(1, 1), padding='same', name='conv_21', use_bias=False)(
 			skip_connection)
 		skip_connection = BatchNormalization(name='norm_21')(skip_connection)
-		skip_connection = LeakyReLU(alpha=0.1)(skip_connection)
+		skip_connection = self.get_activation()(skip_connection)
 
 		skip_connection = Lambda(CustomNetwork.__space_to_depth_x2)(skip_connection)
 
@@ -186,35 +231,31 @@ class CustomNetwork():
 		# Layer 22
 		x = Conv2D(1024, (3, 3), strides=(1, 1), padding='same', name='conv_22', use_bias=False)(x)
 		x = BatchNormalization(name='norm_22')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 
 		# Layer 23
 		x = Conv2D(60, (3, 3), strides=(1, 1), padding='same', name='conv_23', use_bias=False)(x)
 		x = BatchNormalization(name='norm_23')(x)
-		x = LeakyReLU(alpha=0.1)(x)
+		x = self.get_activation()(x)
 
 		return x
 
 
 
 
-	def create_classifier_layers(self,input):
+	def create_classifier_layers(self,input,add_dropout=True):
 		# Layer 24, Fully connected
 		x = Flatten()(input)
-		# print(x.shape)
 		x = Dense(units=100)(x)
-		# print(x.shape)
-		x = LeakyReLU(alpha=0.1)(x)
-		# print(x.shape)
+		#x = LeakyReLU(alpha=0.1)(x)
+		x=self.get_activation()(x)
 
-		x = Dropout(0.3)(x)
-		# print(x.shape)
+		if add_dropout:
+			x = Dropout(0.3)(x)
 		x = Dense(units=CLASS)(x)
-		# print(x.shape)
 
 		output = Softmax()(x)
-		# print(x.shape)
 
 		return output
 
@@ -246,8 +287,8 @@ class CustomNetwork():
 		return early_stop
 
 	def get_tensorboard_log_callback(self):
-		tb_counter = len([log for log in os.listdir('./logs/') if 'custom_' in log]) + 1
-		tensorboard = TensorBoard(log_dir= './logs/'+ 'custom_' + '_' + str(tb_counter),
+		tb_counter = len([log for log in os.listdir(self.logs_dir) if 'custom_' in log]) + 1
+		tensorboard = TensorBoard(log_dir= self.logs_dir+ 'custom_' + '_' + str(tb_counter),
 								  histogram_freq=0,
 								  write_graph=True,
 								  write_images=False)
@@ -255,7 +296,7 @@ class CustomNetwork():
 
 
 	def get_checkpoint_callback(self):
-		checkpoint = ModelCheckpoint('./models'+self.training_settings_name+'/weights.{epoch:02d}-{val_loss:.2f}.hdf5',
+		checkpoint = ModelCheckpoint(self.models_dir+'weights.{epoch:02d}-{val_loss:.2f}.hdf5',
 									 monitor='val_loss',
 									 verbose=1,
 									 save_best_only=True,
@@ -266,39 +307,73 @@ class CustomNetwork():
 
 
 
+	def train(self,train_set_folder,val_set_folder,initial_weights_path=None,initial_epoch=0,optimizer=1,loss=1,activation=1,add_dropout=True):
+		'''
 
-	def set_up(self):
-		#self.create_input_structure()
-		extracted_features=self.create_feature_extractor_layers(input_image)
-		classifier_output=self.create_classifier_layers(extracted_features)
+		:param train_set_folder:
+		:param val_set_folder:
+		:param initial_weights_path:
+		:param initial_epoch:
+		:param optimizer: 1-> Adam, 2-> SGD, 3-> RMSprop
+		:param loss: 1-> categorical_crossentropy
+		:return:
+		'''
 
-		self.model = Model([input_image], classifier_output)
+		self.set_activation_type(activation_type=activation)
+		self.set_up(add_dropout=add_dropout) #SET up model
 
-		#self.model.summary()
-
-		self.initialise_weights()
-
+		if not initial_weights_path:
+			self.initialise_weights()
 
 
-		optimizer = Adam(lr=0.5e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-		# optimizer = SGD(lr=1e-4, decay=0.0005, momentum=0.9)
-		# optimizer = RMSprop(lr=1e-4, rho=0.9, epsilon=1e-08, decay=0.0)
+		self.model.summary()
 
-		self.model.compile(loss= 'categorical_crossentropy',optimizer=optimizer)
+		if optimizer==1:
+			optimizer = Adam(lr=0.5e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+		elif optimizer ==2:
+			optimizer = SGD(lr=1e-4, decay=0.0005, momentum=0.9)
+		elif optimizer==2:
+			optimizer = RMSprop(lr=1e-4, rho=0.9, epsilon=1e-08, decay=0.0)
+		else:
+			raise Exception('Not a valid number for optimizer')
 
+		self.model.compile(loss='categorical_crossentropy', optimizer=optimizer)
+
+		#return
 		early_stop = self.get_early_stoping_callback()
 		checkpoint = self.get_checkpoint_callback()
 		tensorboard = self.get_tensorboard_log_callback()
 
-		training_generator = DataGenerator('../data/train/')
-		valid_generator = DataGenerator('../data/val/')
+		training_generator = DataGenerator(train_set_folder)
+		valid_generator = DataGenerator(val_set_folder)
 
 		self.model.fit_generator(generator=training_generator,
-							steps_per_epoch=len(training_generator),
-							epochs=EPOCHS,
-							verbose=1,
-							validation_data=valid_generator,
-							validation_steps=len(valid_generator),
-							callbacks=[early_stop, checkpoint, tensorboard],
-							max_queue_size=3)
+								 steps_per_epoch=len(training_generator),
+								 epochs=EPOCHS,
+								 verbose=1,
+								 validation_data=valid_generator,
+								 validation_steps=len(valid_generator),
+								 callbacks=[early_stop, checkpoint, tensorboard],
+								 max_queue_size=3,
+								 use_multiprocessing=True,
+								 initial_epoch=initial_epoch)
+
+	def test(self,weights_path):
+		if not weights_path:
+			raise Exception('Weights not given')
+
+		self.set_up()
+
+		self.load_weights_from_file(weights_path)
+
+
+	def set_up(self,add_dropout=True):
+		#self.create_input_structure()
+		extracted_features=self.create_feature_extractor_layers(input_image)
+		classifier_output=self.create_classifier_layers(extracted_features,add_dropout=add_dropout)
+
+		self.model = Model([input_image], classifier_output)
+
+
+
 
