@@ -332,7 +332,7 @@ class CustomNetwork():
 			optimizer = Adam(lr=0.5e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
 		elif optimizer ==2:
 			optimizer = SGD(lr=1e-4, decay=0.0005, momentum=0.9)
-		elif optimizer==2:
+		elif optimizer==3:
 			optimizer = RMSprop(lr=1e-4, rho=0.9, epsilon=1e-08, decay=0.0)
 		else:
 			raise Exception('Not a valid number for optimizer')
