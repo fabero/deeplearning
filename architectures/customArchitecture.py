@@ -281,7 +281,7 @@ class CustomNetwork():
 	def get_early_stoping_callback(self):
 		early_stop = EarlyStopping(monitor='val_loss',
 								   min_delta=0.001,
-								   patience=3,
+								   patience=8,
 								   mode='min',
 								   verbose=1)
 		return early_stop

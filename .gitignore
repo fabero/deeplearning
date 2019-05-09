@@ -4,4 +4,5 @@ models/
 *.swp
 *.pyc
 job_files/
+8_earlystopping_job_files/
 *.out
