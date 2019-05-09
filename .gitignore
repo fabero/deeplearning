@@ -5,6 +5,7 @@ models/
 *.swp
 *.pyc
 job_files/
+accuracy/
 8_earlystopping_job_files/
 *.out
 *.h5

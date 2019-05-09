@@ -63,6 +63,8 @@ class CustomNetwork():
 		self.logs_dir = './logs/'+self.training_settings_name+'/'
 		self.models_dir= './models/'+ self.training_settings_name+'/'
 
+		self.accuracy_dir = './accuracy/' + self.training_settings_name + '/'
+
 		if not os.path.exists(os.path.dirname(self.models_dir)):
 			try:
 				os.makedirs(os.path.dirname(self.models_dir))
@@ -438,8 +440,15 @@ class CustomNetwork():
 
 		accuracy = total_correct/total_data
 		print('ACCURACY:',accuracy)
+		self.write_accuracy_to_file(accuracy)
 
 
+	def write_accuracy_to_file(self,accuracy):
+		text_file = open(self.accuracy_dir+"accuracy.txt", "w")
+
+		text_file.write('ACCURACY:'+str(accuracy))
+
+		text_file.close()
 
 
 	def set_up(self,add_dropout=True,feature_extractor=1,use_batch_normalisation=True):
