@@ -1,3 +1,4 @@
+*.DS_Store
 logs/
 .idea/
 models/
@@ -6,3 +7,4 @@ models/
 job_files/
 8_earlystopping_job_files/
 *.out
+*.h5

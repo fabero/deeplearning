@@ -87,3 +87,53 @@ class DataGenerator(Sequence):
 			y[i] = image_info[3] #Last element of the list is id
 
 		return X, to_categorical(y, num_classes=self.n_classes)
+
+
+
+class TestDataLoader():
+	def __init__(self,data_folder):
+		self.data_folder = data_folder
+		self.all_files = []
+		self.set_all_image_info()
+		self.dim = (IMG_H, IMG_W, 3)
+
+
+
+	def set_all_image_info(self):
+		'''
+		This function will parse all files from the data folder and store category name and id
+		:return:
+		'''
+		self.num_of_files=0
+		for dirname, dirnames, filenames in os.walk(self.data_folder):
+			for subdirname in dirnames:
+				pass
+
+
+			for filename in filenames:
+				if not filename.startswith('.'):
+					self.num_of_files=self.num_of_files+1
+					category = dirname.split('/')[-1]
+					id=LABEL_IDS[category]
+					self.all_files.append((dirname,category,filename,id))
+
+
+
+	def load_image(self,image_path):
+		image = cv.imread(image_path,cv.IMREAD_UNCHANGED)
+		new_dim = (IMG_H, IMG_W) #as all images are of different size so we need to resize
+		image = cv.resize(image,new_dim)
+		return image
+
+
+
+	def generator(self):
+		# Generate data
+		X = np.empty((1, *self.dim))
+		for i, image_info in enumerate(self.all_files):
+			X[0] = self.load_image(image_info[0] + '/' + image_info[2])
+			y = image_info[3]
+			yield X,y
+
+
+
