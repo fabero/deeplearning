@@ -1,3 +1,4 @@
+*.DS_Store
 logs/
 .idea/
 models/
@@ -5,3 +6,4 @@ models/
 *.pyc
 job_files/
 *.out
+*.h5
