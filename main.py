@@ -32,29 +32,29 @@ if __name__ =="__main__":
 	args=parser.parse_args()
 
 
-	# arch = CustomNetwork(training_settings_name=args.training_settings_name)
-	# arch.train(args.train_set_folder,
-	# 		   args.val_set_folder,
-	# 		   initial_weights_path=args.initial_weights_path ,
-	# 		   initial_epoch=args.initial_epoch,
-	# 		   optimizer=args.optimizer,
-	# 		   loss=args.loss,
-	# 		   activation=args.activation,
-	# 		   add_dropout= True if args.add_dropout else False,
-	# 		   feature_extractor=args.feature_extractor,
-	# 		   early_stopping=True if args.early_stopping else False,
-	# 		   early_stopping_epochs=args.early_stopping_epochs,
-	# 		   use_batch_normalisation = True if args.use_batch_normalisation else False,
-	# 		   )
+	arch = CustomNetwork(training_settings_name=args.training_settings_name)
+	arch.train(args.train_set_folder,
+			   args.val_set_folder,
+			   initial_weights_path=args.initial_weights_path ,
+			   initial_epoch=args.initial_epoch,
+			   optimizer=args.optimizer,
+			   loss=args.loss,
+			   activation=args.activation,
+			   add_dropout= True if args.add_dropout else False,
+			   feature_extractor=args.feature_extractor,
+			   early_stopping=True if args.early_stopping else False,
+			   early_stopping_epochs=args.early_stopping_epochs,
+			   use_batch_normalisation = True if args.use_batch_normalisation else False,
+			   )
 
 	# cd = CreateData('../data/natural_images/')
 	# cd.create_train_test_validation_data()
 
 
-	arch=CustomNetwork(training_settings_name=args.training_settings_name)
-	arch.test(args.initial_weights_path,args.test_set_folder,
-			  activation=args.activation,
-			  add_dropout=True if args.add_dropout else False,
-			  feature_extractor=args.feature_extractor,
-			  use_batch_normalisation=True if args.use_batch_normalisation else False,
-			  )
+	# arch=CustomNetwork(training_settings_name=args.training_settings_name)
+	# arch.test(args.initial_weights_path,args.test_set_folder,
+	# 		  activation=args.activation,
+	# 		  add_dropout=True if args.add_dropout else False,
+	# 		  feature_extractor=args.feature_extractor,
+	# 		  use_batch_normalisation=True if args.use_batch_normalisation else False,
+	# 		  )
