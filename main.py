@@ -29,11 +29,14 @@ if __name__ =="__main__":
 	parser.add_argument('--early_stopping_epochs', type=int, default=8)
 
 	parser.add_argument('--use_batch_normalisation', type=int, default=1)
+
+	parser.add_argument('--is_training', type=int, default=1)
+
 	args=parser.parse_args()
 
-
-	arch = CustomNetwork(training_settings_name=args.training_settings_name)
-	arch.train(args.train_set_folder,
+	if args.is_training:
+		arch = CustomNetwork(training_settings_name=args.training_settings_name)
+		arch.train(args.train_set_folder,
 			   args.val_set_folder,
 			   initial_weights_path=args.initial_weights_path ,
 			   initial_epoch=args.initial_epoch,
@@ -46,15 +49,14 @@ if __name__ =="__main__":
 			   early_stopping_epochs=args.early_stopping_epochs,
 			   use_batch_normalisation = True if args.use_batch_normalisation else False,
 			   )
+	else:
+		arch=CustomNetwork(training_settings_name=args.training_settings_name)
+		arch.test(args.initial_weights_path,args.test_set_folder,
+				  activation=args.activation,
+				  add_dropout=True if args.add_dropout else False,
+				  feature_extractor=args.feature_extractor,
+				  use_batch_normalisation=True if args.use_batch_normalisation else False,
+				  )
 
 	# cd = CreateData('../data/natural_images/')
 	# cd.create_train_test_validation_data()
-
-
-	# arch=CustomNetwork(training_settings_name=args.training_settings_name)
-	# arch.test(args.initial_weights_path,args.test_set_folder,
-	# 		  activation=args.activation,
-	# 		  add_dropout=True if args.add_dropout else False,
-	# 		  feature_extractor=args.feature_extractor,
-	# 		  use_batch_normalisation=True if args.use_batch_normalisation else False,
-	# 		  )
