@@ -9,3 +9,4 @@ accuracy/
 8_earlystopping_job_files/
 *.out
 *.h5
+architecture_job_files/
