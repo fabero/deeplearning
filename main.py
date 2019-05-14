@@ -7,6 +7,8 @@ from utils.create_data import CreateData
 
 import argparse
 
+from utils.custom_constants import EPOCHS
+
 
 
 if __name__ =="__main__":
@@ -32,6 +34,8 @@ if __name__ =="__main__":
 
 	parser.add_argument('--is_training', type=int, default=1)
 
+	parser.add_argument('--epochs', type=int, default=EPOCHS)
+
 	args=parser.parse_args()
 
 	if args.is_training:
@@ -48,6 +52,7 @@ if __name__ =="__main__":
 			   early_stopping=True if args.early_stopping else False,
 			   early_stopping_epochs=args.early_stopping_epochs,
 			   use_batch_normalisation = True if args.use_batch_normalisation else False,
+			   epochs = args.epochs
 			   )
 	else:
 		arch=CustomNetwork(training_settings_name=args.training_settings_name)

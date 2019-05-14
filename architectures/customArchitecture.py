@@ -349,6 +349,7 @@ class CustomNetwork():
 			  early_stopping=True,
 			  early_stopping_epochs=8,
 			  use_batch_normalisation=True,#Only for custom
+			  epochs=EPOCHS
 			  ):
 		'''
 
@@ -402,7 +403,7 @@ class CustomNetwork():
 
 		self.model.fit_generator(generator=training_generator,
 								 steps_per_epoch=len(training_generator),
-								 epochs=EPOCHS,
+								 epochs=epochs,
 								 verbose=1,
 								 validation_data=valid_generator,
 								 validation_steps=len(valid_generator),
